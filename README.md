@@ -1,26 +1,30 @@
-# Ares commercial diligence (password-protected site)
+# Password-protected site (single file)
 
-The site is `index.html`, the customer deliverable of 30 September 2026 (with the Monro term-sheet section). `middleware.js` asks for a password on every request before anything is served.
+The whole site is `index.html`. The password check is built into the page itself, so there is no middleware, no `package.json` and nothing to configure on the host.
 
-- Password: `AutoCare2026`
-- Username: anything (the browser asks for both; leave the name blank or type any word)
+- Opening the page shows a CreditSwan password screen. The correct password unlocks the document in the browser.
+- The document inside `index.html` is encrypted with the password (AES-256). The password is not written anywhere in the file, and viewing the page source shows only scrambled text.
+- Once unlocked, the page stays open for that browser tab, including on refresh. Closing the tab locks it again.
+- The file also works when opened directly from a computer or sent as an attachment.
 
 ## Deploy
 
-Either way, Vercel detects no framework. Leave Build Command and Output Directory empty (Framework Preset: Other).
+Vercel detects no framework. Leave Build Command and Output Directory empty (Framework Preset: Other).
 
 **Vercel CLI** (from this folder):
 
-    npx vercel        # first time: link or create the project
     npx vercel --prod
 
-**GitHub**: push this folder to a private repository, then in Vercel choose Add New, then Project, then import that repository and Deploy.
+**GitHub**: replace the repository contents with this folder and push. Delete `middleware.js`, `package.json` and `package-lock.json` from the repository, otherwise the old browser password prompt stays in front of the new one.
+
+If `SITE_PASSWORD` is set in the Vercel project's environment variables, it is no longer used and can be removed.
 
 ## Change the password
 
-In the Vercel project, go to Settings, then Environment Variables. Add `SITE_PASSWORD` with the new value and redeploy. Without it, the default in `middleware.js` applies.
+The password is part of the encryption, so it cannot be edited by hand. The page has to be rebuilt from the original document with the new password.
 
 ## Notes
 
-- Search engines are told not to index the site (`X-Robots-Tag` header and `robots.txt`).
-- The page loads its fonts from Google Fonts. Everything else is inside `index.html`.
+- Search engines are told not to index the site (`X-Robots-Tag` header, `robots.txt` and a meta tag on the password screen).
+- The password screen names only CreditSwan. The client and subject appear only after unlocking.
+- Needs a current browser: Chrome or Edge, Safari 16.4 or later, Firefox 113 or later.
